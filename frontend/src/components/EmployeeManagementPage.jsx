@@ -6,25 +6,23 @@ import BulkUpload from './BulkUpload';
 const EmployeeManagementPage = () => {
   const [employees, setEmployees] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const [loadError, setLoadError] = useState(null);
 
   const fetchEmployees = async () => {
     try {
       const res = await axios.get('/api/employees');
       console.log("Response from /api/employees:", res.data, Array.isArray(res.data));
+      
+      // ✅ Handle both direct array and object-with-array response
+      const employeeList = Array.isArray(res.data)
+        ? res.data
+        : Array.isArray(res.data.employees)
+        ? res.data.employees
+        : [];
 
-      if (Array.isArray(res.data)) {
-        setEmployees(res.data);
-        setLoadError(null);
-      } else {
-        console.error("Unexpected data format:", res.data);
-        setLoadError("Invalid response format: Expected an array.");
-        setEmployees([]);
-      }
+      setEmployees(employeeList);
     } catch (error) {
       console.error("Error fetching employees:", error);
-      setLoadError("Failed to load employees.");
-      setEmployees([]);
+      setEmployees([]); // fallback to empty list
     }
   };
 
@@ -43,11 +41,12 @@ const EmployeeManagementPage = () => {
       <BulkUpload onUploadSuccess={fetchEmployees} />
       <EmployeeForm selectedEmployee={selectedEmployee} onSave={handleSave} />
       <h3>Existing Employees</h3>
-      
-      {loadError && <p style={{ color: 'red' }}>{loadError}</p>}
+
+      {/* Debugging output */}
+      <pre>{JSON.stringify(employees, null, 2)}</pre>
 
       <ul>
-        {employees.map(emp => (
+        {(Array.isArray(employees) ? employees : []).map(emp => (
           <li
             key={emp._id}
             onClick={() => setSelectedEmployee(emp)}
@@ -62,4 +61,3 @@ const EmployeeManagementPage = () => {
 };
 
 export default EmployeeManagementPage;
-
