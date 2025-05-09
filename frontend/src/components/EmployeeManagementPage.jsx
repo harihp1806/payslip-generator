@@ -8,10 +8,16 @@ const EmployeeManagementPage = () => {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   const fetchEmployees = async () => {
+  try {
     const res = await axios.get('/api/employees');
-    console.log("Fetched employees:", res.data, Array.isArray(res.data));
+    console.log("Response from /api/employees:", res.data, Array.isArray(res.data));
     setEmployees(res.data);
-  };
+  } catch (error) {
+    console.error("Error fetching employees:", error);
+    setEmployees([]); // fallback to empty list
+  }
+};
+
 
   useEffect(() => {
     fetchEmployees();
