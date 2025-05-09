@@ -9,21 +9,21 @@ const EmployeeManagementPage = () => {
 
   const fetchEmployees = async () => {
     try {
-      const res = await axios.get('/api/employees');
+      // Use the correct URL for your hosted backend
+      const res = await axios.get('https://payslip-generator-1-8pdp.onrender.com/api/employees'); // Update with your backend URL
       console.log("Response from /api/employees:", res.data);
 
-      // Check if the response is an array directly, otherwise look inside for employees
-      const employeeList = Array.isArray(res.data) 
-        ? res.data 
-        : (res.data && Array.isArray(res.data.employees) 
-          ? res.data.employees 
+      const employeeList = Array.isArray(res.data)
+        ? res.data
+        : (res.data && Array.isArray(res.data.employees)
+          ? res.data.employees
           : []); // Fallback to empty array
 
-      console.log('Employee List:', employeeList); // Log the employee list
-      setEmployees(employeeList); // Set the state with the employee list
+      console.log("Employee List:", employeeList);
+      setEmployees(employeeList); // Update the state with the fetched list
     } catch (error) {
-      console.error("Error fetching employees:", error);
-      setEmployees([]); // Fallback to an empty list in case of error
+      console.error("Error fetching employees:", error.response || error.message);
+      setEmployees([]); // Fallback to empty list in case of error
     }
   };
 
@@ -32,8 +32,8 @@ const EmployeeManagementPage = () => {
   }, []);
 
   const handleSave = () => {
-    fetchEmployees();
-    setSelectedEmployee(null);
+    fetchEmployees(); // Refresh employee list after save
+    setSelectedEmployee(null); // Reset selected employee
   };
 
   return (
@@ -47,8 +47,8 @@ const EmployeeManagementPage = () => {
       <pre>{JSON.stringify(employees, null, 2)}</pre>
 
       <ul>
-        {/* Force employees to be an array in map */}
-        {(employees && Array.isArray(employees) ? employees : []).map(emp => (
+        {/* Check if employees is an array before attempting to map */}
+        {(Array.isArray(employees) ? employees : []).map(emp => (
           <li
             key={emp._id}
             onClick={() => setSelectedEmployee(emp)}
