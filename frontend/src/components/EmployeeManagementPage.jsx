@@ -8,24 +8,26 @@ const EmployeeManagementPage = () => {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   const fetchEmployees = async () => {
-    try {
-      const res = await axios.get('/api/employees');
-      console.log("Response from /api/employees:", res.data, Array.isArray(res.data));
+  try {
+    const res = await axios.get('/api/employees');
+    console.log("Response from /api/employees:", res.data);
 
-      // Handle both direct array and object-with-array response
-      const employeeList = Array.isArray(res.data)
-        ? res.data
-        : res.data && Array.isArray(res.data.employees)
-        ? res.data.employees
-        : [];
+    // Ensure we get an array, otherwise fallback to an empty array
+    const employeeList = Array.isArray(res.data)
+      ? res.data
+      : (res.data && Array.isArray(res.data.employees))
+      ? res.data.employees
+      : [];
 
-      // Set the state to an array (even if it's empty)
-      setEmployees(employeeList);
-    } catch (error) {
-      console.error("Error fetching employees:", error);
-      setEmployees([]); // Fallback to an empty list in case of error
-    }
-  };
+    console.log('Employee List:', employeeList); // Log the employee list to inspect it
+
+    setEmployees(employeeList);
+  } catch (error) {
+    console.error("Error fetching employees:", error);
+    setEmployees([]); // Fallback to an empty list in case of error
+  }
+};
+
 
   useEffect(() => {
     fetchEmployees();
