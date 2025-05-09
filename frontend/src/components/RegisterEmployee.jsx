@@ -21,7 +21,7 @@ const RegisterEmployee = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/employee', form);
+      await axios.post('https://payslip-generator-1-8pdp.onrender.com/api/employee', form);
       setMessage('Employee registered successfully!');
       setForm({
         employeeId: '',
