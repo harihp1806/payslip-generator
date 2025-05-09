@@ -4,30 +4,28 @@ import EmployeeForm from './EmployeeForm';
 import BulkUpload from './BulkUpload';
 
 const EmployeeManagementPage = () => {
-  const [employees, setEmployees] = useState([]); // Ensure it's always initialized as an array
+  const [employees, setEmployees] = useState([]); // Always start with an empty array
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   const fetchEmployees = async () => {
-  try {
-    const res = await axios.get('/api/employees');
-    console.log("Response from /api/employees:", res.data);
+    try {
+      const res = await axios.get('/api/employees');
+      console.log("Response from /api/employees:", res.data);
 
-    // Ensure we get an array, otherwise fallback to an empty array
-    const employeeList = Array.isArray(res.data)
-      ? res.data
-      : (res.data && Array.isArray(res.data.employees))
-      ? res.data.employees
-      : [];
-
-    console.log('Employee List:', employeeList); // Log the employee list to inspect it
-
-    setEmployees(employeeList);
-  } catch (error) {
-    console.error("Error fetching employees:", error);
-    setEmployees([]); // Fallback to an empty list in case of error
-  }
-};
-
+      // Extract the employee list properly
+      const employeeList = Array.isArray(res.data)
+        ? res.data
+        : res.data && Array.isArray(res.data.employees)
+        ? res.data.employees
+        : [];
+      
+      console.log('Employee List:', employeeList); // Log the employee list
+      setEmployees(employeeList);
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+      setEmployees([]); // Fallback to an empty list in case of error
+    }
+  };
 
   useEffect(() => {
     fetchEmployees();
@@ -49,7 +47,8 @@ const EmployeeManagementPage = () => {
       <pre>{JSON.stringify(employees, null, 2)}</pre>
 
       <ul>
-        {(Array.isArray(employees) ? employees : []).map(emp => (
+        {/* Safeguard if employees is not an array */}
+        {(employees && Array.isArray(employees) ? employees : []).map(emp => (
           <li
             key={emp._id}
             onClick={() => setSelectedEmployee(emp)}
