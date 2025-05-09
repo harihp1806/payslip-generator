@@ -4,7 +4,7 @@ import EmployeeForm from './EmployeeForm';
 import BulkUpload from './BulkUpload';
 
 const EmployeeManagementPage = () => {
-  const [employees, setEmployees] = useState([]); // Always start with an empty array
+  const [employees, setEmployees] = useState([]); // Default empty array
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   const fetchEmployees = async () => {
@@ -12,15 +12,15 @@ const EmployeeManagementPage = () => {
       const res = await axios.get('/api/employees');
       console.log("Response from /api/employees:", res.data);
 
-      // Extract the employee list properly
-      const employeeList = Array.isArray(res.data)
-        ? res.data
-        : res.data && Array.isArray(res.data.employees)
-        ? res.data.employees
-        : [];
-      
+      // Check if the response is an array directly, otherwise look inside for employees
+      const employeeList = Array.isArray(res.data) 
+        ? res.data 
+        : (res.data && Array.isArray(res.data.employees) 
+          ? res.data.employees 
+          : []); // Fallback to empty array
+
       console.log('Employee List:', employeeList); // Log the employee list
-      setEmployees(employeeList);
+      setEmployees(employeeList); // Set the state with the employee list
     } catch (error) {
       console.error("Error fetching employees:", error);
       setEmployees([]); // Fallback to an empty list in case of error
@@ -47,7 +47,7 @@ const EmployeeManagementPage = () => {
       <pre>{JSON.stringify(employees, null, 2)}</pre>
 
       <ul>
-        {/* Safeguard if employees is not an array */}
+        {/* Force employees to be an array in map */}
         {(employees && Array.isArray(employees) ? employees : []).map(emp => (
           <li
             key={emp._id}
