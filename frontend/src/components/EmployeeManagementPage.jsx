@@ -6,18 +6,27 @@ import BulkUpload from './BulkUpload';
 const EmployeeManagementPage = () => {
   const [employees, setEmployees] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [loadError, setLoadError] = useState(null);
 
   const fetchEmployees = async () => {
-  try {
-    const res = await axios.get('/api/employees');
-    console.log("Response from /api/employees:", res.data, Array.isArray(res.data));
-    setEmployees(res.data);
-  } catch (error) {
-    console.error("Error fetching employees:", error);
-    setEmployees([]); // fallback to empty list
-  }
-};
+    try {
+      const res = await axios.get('/api/employees');
+      console.log("Response from /api/employees:", res.data, Array.isArray(res.data));
 
+      if (Array.isArray(res.data)) {
+        setEmployees(res.data);
+        setLoadError(null);
+      } else {
+        console.error("Unexpected data format:", res.data);
+        setLoadError("Invalid response format: Expected an array.");
+        setEmployees([]);
+      }
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+      setLoadError("Failed to load employees.");
+      setEmployees([]);
+    }
+  };
 
   useEffect(() => {
     fetchEmployees();
@@ -34,6 +43,9 @@ const EmployeeManagementPage = () => {
       <BulkUpload onUploadSuccess={fetchEmployees} />
       <EmployeeForm selectedEmployee={selectedEmployee} onSave={handleSave} />
       <h3>Existing Employees</h3>
+      
+      {loadError && <p style={{ color: 'red' }}>{loadError}</p>}
+
       <ul>
         {employees.map(emp => (
           <li
@@ -50,3 +62,4 @@ const EmployeeManagementPage = () => {
 };
 
 export default EmployeeManagementPage;
+
