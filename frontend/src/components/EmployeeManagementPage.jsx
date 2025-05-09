@@ -9,6 +9,7 @@ const EmployeeManagementPage = () => {
 
   const fetchEmployees = async () => {
     const res = await axios.get('/api/employees');
+    console.log("Fetched employees:", res.data, Array.isArray(res.data));
     setEmployees(res.data);
   };
 
